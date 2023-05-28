@@ -2,10 +2,7 @@ package com.example.springsecurityapplication.models;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import org.springframework.stereotype.Controller;
-
 import java.util.List;
 import java.util.Objects;
 

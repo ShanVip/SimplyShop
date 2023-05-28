@@ -44,12 +44,10 @@ public class Product {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "product")
     private List<Image> imageList = new ArrayList<>();
 
-    // Данный метод позволяет добавить фотографию в лист текущего продукта
     public void addImageToProduct(Image image){
         image.setProduct(this);
         imageList.add(image);
     }
-    // Данный метод будет заполнять поле даты и времени при создании объекта класса
     @PrePersist
     private void init(){
         dateTime = LocalDateTime.now();

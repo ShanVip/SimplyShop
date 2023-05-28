@@ -38,7 +38,9 @@ public class MainController {
 
     private final OrderRepository orderRepository;
 
-    public MainController(ProductRepository productRepository, PersonValidator personValidator, PersonService personService, ProductService productService, CartRepository cartRepository, OrderRepository orderRepository) {
+    public MainController(ProductRepository productRepository, PersonValidator personValidator,
+                          PersonService personService, ProductService productService,
+                          CartRepository cartRepository, OrderRepository orderRepository) {
         this.productRepository = productRepository;
         this.personValidator = personValidator;
         this.personService = personService;
@@ -49,27 +51,15 @@ public class MainController {
 
     @GetMapping("/person account")
     public String index(Model model){
-        // Получаем объект аутентификации -> с помощью SpringContextHolder обращаемся к контексту и на нем вызываем метод аутентификации. Из сессии текущего пользователя получаем объект, который был положен в данную сессию после аутентификации пользователя
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
         String role = personDetails.getPerson().getRole();
         if(role.equals("ROLE_ADMIN")){
             return "redirect:/admin";
         }
-//        System.out.println(personDetails.getPerson());
-//        System.out.println("ID пользователя: " + personDetails.getPerson().getId());
-//        System.out.println("Логин пользователя: " + personDetails.getPerson().getLogin());
-//        System.out.println("Пароль пользователя: " + personDetails.getPerson().getPassword());
-//        System.out.println(personDetails);
         model.addAttribute("products", productService.getAllProduct());
         return "/user/index";
     }
-
-    //    @GetMapping("/registration")
-//    public String registration(Model model){
-//        model.addAttribute("person", new Person());
-//        return "registration";
-//    }
 
     @GetMapping("/registration")
     public String registration(@ModelAttribute("person") Person person){
@@ -93,7 +83,11 @@ public class MainController {
     }
 
     @PostMapping("/person account/product/search")
-    public String productSearch(@RequestParam("search") String search, @RequestParam("ot") String ot, @RequestParam("do") String Do, @RequestParam(value = "price", required = false, defaultValue = "") String price, @RequestParam(value = "contract", required = false, defaultValue = "")String contract, Model model){
+    public String productSearch(@RequestParam("search") String search, @RequestParam("ot") String ot,
+                                @RequestParam("do") String Do,
+                                @RequestParam(value = "price", required = false, defaultValue = "") String price,
+                                @RequestParam(value = "contract", required = false, defaultValue = "")String contract,
+                                Model model) {
         model.addAttribute("products", productService.getAllProduct());
 
         if(!ot.isEmpty() & !Do.isEmpty()){
@@ -101,31 +95,49 @@ public class MainController {
                 if(price.equals("sorted_by_ascending_price")) {
                     if (!contract.isEmpty()) {
                         if (contract.equals("furniture")) {
-                            model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPriceAsc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 1));
+                            model.addAttribute("search_product",
+                                    productRepository.findByTitleAndCategoryOrderByPriceAsc(search.toLowerCase(),
+                                            Float.parseFloat(ot), Float.parseFloat(Do), 1));
                         } else if (contract.equals("appliances")) {
-                            model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPriceAsc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 3));
+                            model.addAttribute("search_product",
+                                    productRepository.findByTitleAndCategoryOrderByPriceAsc(search.toLowerCase(),
+                                            Float.parseFloat(ot), Float.parseFloat(Do), 3));
                         } else if (contract.equals("clothes")) {
-                            model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPriceAsc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 2));
+                            model.addAttribute("search_product",
+                                    productRepository.findByTitleAndCategoryOrderByPriceAsc(search.toLowerCase(),
+                                            Float.parseFloat(ot), Float.parseFloat(Do), 2));
                         }
                     } else {
-                        model.addAttribute("search_product", productRepository.findByTitleOrderByPriceAsc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do)));
+                        model.addAttribute("search_product",
+                                productRepository.findByTitleOrderByPriceAsc(search.toLowerCase(),
+                                        Float.parseFloat(ot), Float.parseFloat(Do)));
                     }
                 } else if(price.equals("sorted_by_descending_price")){
                     if(!contract.isEmpty()){
                         System.out.println(contract);
                         if(contract.equals("furniture")){
-                            model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPriceDesc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 1));
+                            model.addAttribute("search_product",
+                                    productRepository.findByTitleAndCategoryOrderByPriceDesc(search.toLowerCase(),
+                                            Float.parseFloat(ot), Float.parseFloat(Do), 1));
                         }else if (contract.equals("appliances")) {
-                            model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPriceDesc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 3));
+                            model.addAttribute("search_product",
+                                    productRepository.findByTitleAndCategoryOrderByPriceDesc(search.toLowerCase(),
+                                            Float.parseFloat(ot), Float.parseFloat(Do), 3));
                         } else if (contract.equals("clothes")) {
-                            model.addAttribute("search_product", productRepository.findByTitleAndCategoryOrderByPriceDesc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do), 2));
+                            model.addAttribute("search_product",
+                                    productRepository.findByTitleAndCategoryOrderByPriceDesc(search.toLowerCase(),
+                                            Float.parseFloat(ot), Float.parseFloat(Do), 2));
                         }
                     }  else {
-                        model.addAttribute("search_product", productRepository.findByTitleOrderByPriceDesc(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do)));
+                        model.addAttribute("search_product",
+                                productRepository.findByTitleOrderByPriceDesc(search.toLowerCase(),
+                                        Float.parseFloat(ot), Float.parseFloat(Do)));
                     }
                 }
             } else {
-                model.addAttribute("search_product", productRepository.findByTitleAndPriceGreaterThanEqualAndPriceLessThanEqual(search.toLowerCase(), Float.parseFloat(ot), Float.parseFloat(Do)));
+                model.addAttribute("search_product",
+                        productRepository.findByTitleAndPriceGreaterThanEqualAndPriceLessThanEqual(search.toLowerCase(),
+                                Float.parseFloat(ot), Float.parseFloat(Do)));
             }
         } else {
             model.addAttribute("search_product", productRepository.findByTitleContainingIgnoreCase(search));
@@ -139,13 +151,10 @@ public class MainController {
     }
 
     @GetMapping("/cart/add/{id}")
-    public String addProductInCart(@PathVariable("id") int id, Model model){
-        // Получаем продукт по id
+    public String addProductInCart(@PathVariable("id") int id){
         Product product = productService.getProductId(id);
-        // Извлекаем объект аутентифицированного пользователя
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
-        // Извлекаем id пользователя из объекта
         int id_person = personDetails.getPerson().getId();
         Cart cart = new Cart(id_person, product.getId());
         cartRepository.save(cart);
@@ -156,18 +165,15 @@ public class MainController {
     public String cart(Model model){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
-        // Извлекаем id пользователя из объекта
         int id_person = personDetails.getPerson().getId();
 
         List<Cart> cartList = cartRepository.findByPersonId(id_person);
         List<Product> productList = new ArrayList<>();
 
-        // Получаем продукты из корзины по id товара
         for (Cart cart: cartList) {
             productList.add(productService.getProductId(cart.getProductId()));
         }
 
-        // Вычисление итоговой цена
         float price = 0;
         for (Product product: productList) {
             price += product.getPrice();
@@ -182,12 +188,10 @@ public class MainController {
     public String deleteProductFromCart(Model model, @PathVariable("id") int id){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
-        // Извлекаем id пользователя из объекта
         int id_person = personDetails.getPerson().getId();
         List<Cart> cartList = cartRepository.findByPersonId(id_person);
         List<Product> productList = new ArrayList<>();
 
-        // Получаем продукты из корзины по id товара
         for (Cart cart: cartList) {
             productList.add(productService.getProductId(cart.getProductId()));
         }
@@ -199,18 +203,15 @@ public class MainController {
     public String order(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         PersonDetails personDetails = (PersonDetails) authentication.getPrincipal();
-        // Извлекаем id пользователя из объекта
         int id_person = personDetails.getPerson().getId();
 
         List<Cart> cartList = cartRepository.findByPersonId(id_person);
         List<Product> productList = new ArrayList<>();
 
-        // Получаем продукты из корзины по id товара
         for (Cart cart: cartList) {
             productList.add(productService.getProductId(cart.getProductId()));
         }
 
-        // Вычисление итоговой цена
         float price = 0;
         for (Product product: productList) {
             price += product.getPrice();
@@ -218,7 +219,8 @@ public class MainController {
 
         String uuid = UUID.randomUUID().toString();
         for(Product product : productList){
-            Order newOrder = new Order(uuid, product, personDetails.getPerson(), 1, product.getPrice(), Status.Оформлен);
+            Order newOrder = new Order(uuid, product, personDetails.getPerson(), 1,
+                    product.getPrice(), Status.Оформлен);
             orderRepository.save(newOrder);
             cartRepository.deleteCartByProductId(product.getId());
         }
